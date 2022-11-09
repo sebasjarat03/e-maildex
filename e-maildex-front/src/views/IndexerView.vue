@@ -13,7 +13,7 @@
       <p class="my-2">{{ email.sender }}</p>
       <h5>To:</h5>
       <p class="my-2">: {{ email.recipient }}</p>
-      <p class="my-4">{{ email.message }}</p>
+      <p class="my-4" v-html="email.message"></p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -47,8 +47,18 @@
       </div>
     </div>
   </div>
+
+  <div v-if="loading">
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col">
+          <Loading/>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="container mt-4">
-    <table id ="tableMails" class="table table-hover">
+    <table id ="tableMails" class="table table-hover" >
       <thead>
         <tr>
           <th scope="col">Subject</th>
@@ -77,13 +87,18 @@
 
   import axios from "axios"
   import $ from "jquery"
+  import Loading from "../components/Loading.vue"
   
   export default {
     name: "IndexerView",
+    components:{
+      Loading
+    },
 
    
     data: function(){
       return{
+        loading: false,
         text:'',
         mails : [],
         email: {},
@@ -101,15 +116,19 @@
     methods:{
       
       async searchMail(){
+        
         $('#tableMails').DataTable().destroy()
-        try{let response = await axios.get(`http://localhost:3000/indexer/${this.text}`).then(response => (this.mails = response.data.emails))
+        try{
+          this.loading = true
+          let response = await axios.get(`http://localhost:3000/indexer/${this.text}`).then(response => (this.mails = response.data.emails))
         console.log(response)
         $('#tableMails').DataTable({"searching": false});
         $('.dataTables_length').addClass('bs-select');
-
+          this.loading = false
         }
         catch(error){
           this.errorMessage =error
+          this.loading = false
         }
        
         
@@ -118,6 +137,9 @@
 
       setEmailInformation(email) {
         this.email = email;
+        const regEx = new RegExp(this.text, "gi")
+        const upperWord = this.text.toUpperCase().bold()
+        this.email.message= this.email.message.replace(regEx, upperWord)
       }
     }
     
