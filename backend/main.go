@@ -104,7 +104,6 @@ func SearchDocumentsByfilter(w http.ResponseWriter, r *http.Request) {
 	emails, err := mapMails(*dResponse)
 
 	if err != nil {
-		fmt.Println("estoy aqui si")
 		return
 
 	}
@@ -128,12 +127,10 @@ func mapMails(response SearchResponse) ([]Email, error) {
 		}
 
 		err = json.Unmarshal(bytes, &email)
-		if err != nil {
 
-		}
 		emails = append(emails, email)
 
 	}
-	print("before -> ", emails)
+
 	return emails, nil
 }

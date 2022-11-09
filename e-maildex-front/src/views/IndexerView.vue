@@ -38,7 +38,7 @@
               <input type="text" class="form-control" v-model="text" placeholder="Search">
             </div>
             <div class="col">
-              <button @click.prevent="(e) => searchMail()" type="button" class="btn btn-primary"> Search </button>
+              <button v-on:click="searchMail()" type="button" class="btn btn-success"> Search </button>
             </div>
               </div>
             </div>
@@ -57,15 +57,15 @@
           <th scope="col">View mail</th>
         </tr>
       </thead>
-      <tbody v-for="email in mails" :key="email.id">
+      <tbody >
         
-        <tr>
+        <tr v-for="email in mails" :key="email.id">
           <td>{{email.subject}}</td>
           <td>{{email.sender}}</td>
           <td>{{email.recipient}}</td>
-          <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" v-on:click="setEmailInformation(email)">
+          <td><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" v-on:click="setEmailInformation(email)">
             <i class="far fa-eye"></i>
-</button></td>
+          </button></td>
         </tr>
       </tbody>
     </table>
@@ -74,10 +74,14 @@
 
 <script>
 
+
   import axios from "axios"
+  import $ from "jquery"
+  
   export default {
     name: "IndexerView",
 
+   
     data: function(){
       return{
         text:'',
@@ -90,25 +94,33 @@
     async created(){
       
     },
+    mounted(){
+      
+    },
     
     methods:{
+      
       async searchMail(){
+        $('#tableMails').DataTable().destroy()
         try{let response = await axios.get(`http://localhost:3000/indexer/${this.text}`).then(response => (this.mails = response.data.emails))
         console.log(response)
-        this.showTable =true
+        $('#tableMails').DataTable({"searching": false});
+        $('.dataTables_length').addClass('bs-select');
+
         }
         catch(error){
           this.errorMessage =error
         }
-        
+       
         
      
       },
 
       setEmailInformation(email) {
-      this.email = email;
-    }
+        this.email = email;
+      }
     }
     
   }
+  
 </script>
